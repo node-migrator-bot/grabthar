@@ -50,62 +50,67 @@ function getJSONApi (next) {
 
   app.log.info('Downloading ' + 'JSONApi'.cyan + '...');
 
-  app.ticker(function (t) {
+  utile.mkdirp(path.dirname(api.path), 0775, function (err) {
+    if (err) {
+      throw err;
+    }
 
-    request(api.url)
-      .pipe(fs.createWriteStream(api.path))
-      .on('close', function (err) {
-        if (err) {
-          throw err;
-        }
+    app.ticker(function (t) {
 
-        t.stop(function () {
+      request(api.url)
+        .pipe(fs.createWriteStream(api.path))
+        .on('close', function (err) {
+          if (err) {
+            throw err;
+          }
 
-          app.log.info('Downloading ' + 'JSONApi'.cyan + ' complete.');
+          t.stop(function () {
 
-          app.log.info('Unpacking ' + api.path.cyan );
+            app.log.info('Downloading ' + 'JSONApi'.cyan + ' complete.');
 
-          // This api is all sync but whatever.
-          var files = zip.Reader(fs.readFileSync(api.path)).toObject('utf8');
+            app.log.info('Unpacking ' + api.path.cyan );
 
-          utile.async.forEachSeries(Object.keys(files), function (fname, cb) {
-            var p = path.resolve(path.dirname(api.path), fname);
+            // This api is all sync but whatever.
+            var files = zip.Reader(fs.readFileSync(api.path)).toObject('utf8');
 
-            app.log.info('Writing '.blue + p);
-            utile.mkdirp(path.dirname(p), 0775, function (err) {
+            utile.async.forEachSeries(Object.keys(files), function (fname, cb) {
+              var p = path.resolve(path.dirname(api.path), fname);
+
+              app.log.info('Writing '.blue + p);
+              utile.mkdirp(path.dirname(p), 0775, function (err) {
+                if (err) {
+                  throw err;
+                }
+
+                fs.writeFileSync(
+                  p,
+                  files[fname]
+                );
+
+                cb();
+              })
+            }, function (err) {
               if (err) {
                 throw err;
               }
 
-              fs.writeFileSync(
-                p,
-                files[fname]
-              );
+              app.log.info('Unpacked.');
+              app.log.info('Removing zip archive...');
 
-              cb();
-            })
-          }, function (err) {
-            if (err) {
-              throw err;
-            }
+              utile.rimraf(api.path, function (err) {
+                if (err) {
+                  throw err;
+                }
 
-            app.log.info('Unpacked.');
-            app.log.info('Removing zip archive...');
+                next();
+              });
 
-            utile.rimraf(api.path, function (err) {
-              if (err) {
-                throw err;
-              }
-
-              next();
             });
-
           });
         });
-      });
 
-    t.start();
-
+      t.start();
+    });
   });
 }
 
