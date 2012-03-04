@@ -1,0 +1,24 @@
+{
+  "author": "Joshua Holbrook <josh.holbrook@gmail.com>",
+  "name": "bukkit.js",
+  "description": "npm install a craftbukkit server",
+  "version": "0.0.0",
+  "repository": {
+    "url": ""
+  },
+  "engines": {
+    "node": "~0.6.10"
+  },
+  "scripts": {
+    "install": "node bin/install.js",
+    "start": "node bin/bukkit.js"
+  },
+  "dependencies": {
+    "colors": "*",
+    "request": "2.9.153",
+    "flatiron": "0.1.14",
+    "moment": "1.4.0"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {}
+}
