@@ -9,8 +9,7 @@
   "engines": {
     "node": "~0.6.10"
   },
-  "scripts": {
-  },
+  "main": "./lib/grabthar",
   "dependencies": {
     "colors": "*",
     "request": "git+ssh://git@github.com:jesusabdullah/request.git",
