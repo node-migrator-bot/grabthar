@@ -27,11 +27,12 @@ function getCraftBukkit (next) {
       throw err;
     }
 
-    app.ticker.stop();
+    app.ticker.stop(function () {
 
-    app.log.info('Downloading ' + 'craftbukkit'.cyan + ' complete.');
+      app.log.info('Downloading ' + 'craftbukkit'.cyan + ' complete.');
 
-    next();
+      next();
+    });
 
   });
 
@@ -57,49 +58,49 @@ function getJSONApi (next) {
       throw err;
     }
 
-    app.ticker.stop();
+    app.ticker.stop(function () {
 
-    app.log.info('Downloading ' + 'JSONApi'.cyan + ' complete.');
+      app.log.info('Downloading ' + 'JSONApi'.cyan + ' complete.');
 
-    app.log.info('Unpacking ' + api.path.cyan );
+      app.log.info('Unpacking ' + api.path.cyan );
 
-    // This api is all sync but whatever.
-    var files = zip.Reader(fs.readFileSync(api.path)).toObject('utf8');
+      // This api is all sync but whatever.
+      var files = zip.Reader(fs.readFileSync(api.path)).toObject('utf8');
 
-    utile.async.forEachSeries(Object.keys(files), function (fname, cb) {
-      var p = path.resolve(path.dirname(api.path), fname);
+      utile.async.forEachSeries(Object.keys(files), function (fname, cb) {
+        var p = path.resolve(path.dirname(api.path), fname);
 
-      app.log.info('Writing '.blue + p);
-      utile.mkdirp(path.dirname(p), 0775, function (err) {
+        app.log.info('Writing '.blue + p);
+        utile.mkdirp(path.dirname(p), 0775, function (err) {
+          if (err) {
+            throw err;
+          }
+
+          fs.writeFileSync(
+            p,
+            files[fname]
+          );
+
+          cb();
+        })
+      }, function (err) {
         if (err) {
           throw err;
         }
 
-        fs.writeFileSync(
-          p,
-          files[fname]
-        );
+        app.log.info('Unpacked.');
+        app.log.info('Removing zip archive...');
 
-        cb();
-      })
-    }, function (err) {
-      if (err) {
-        throw err;
-      }
+        utile.rimraf(api.path, function (err) {
+          if (err) {
+            throw err;
+          }
 
-      app.log.info('Unpacked.');
-      app.log.info('Removing zip archive...');
+          next();
+        });
 
-      utile.rimraf(api.path, function (err) {
-        if (err) {
-          throw err;
-        }
-
-        next();
       });
-
     });
-
   });
 
   app.ticker.start();
@@ -108,5 +109,6 @@ function getJSONApi (next) {
 getCraftBukkit(function () {
   getJSONApi(function () {
     app.log.info('Done.');
+    process.exit(0);
   });
 });
