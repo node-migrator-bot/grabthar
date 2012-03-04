@@ -19,7 +19,8 @@
     "flatiron": "0.1.14",
     "moment": "1.4.0",
     "zip": "0.0.6",
-    "utile": "0.0.10"
+    "utile": "0.0.10",
+    "mc_jsonapi": "1.1.0"
   },
   "devDependencies": {},
   "optionalDependencies": {}
