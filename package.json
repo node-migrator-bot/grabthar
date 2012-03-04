@@ -1,8 +1,8 @@
 {
   "author": "Joshua Holbrook <josh.holbrook@gmail.com>",
-  "name": "bukkit.js",
-  "description": "npm install a craftbukkit server",
-  "version": "0.0.0",
+  "name": "grabthar",
+  "description": "The little build task library that could.",
+  "version": "0.0.0-alpha",
   "repository": {
     "url": ""
   },
@@ -10,8 +10,6 @@
     "node": "~0.6.10"
   },
   "scripts": {
-    "install": "node bin/install.js",
-    "start": "node bin/bukkit.js"
   },
   "dependencies": {
     "colors": "*",
@@ -20,8 +18,7 @@
     "moment": "1.4.0",
     "zip": "0.0.6",
     "utile": "0.0.10",
-    "multimeter": "0.1.0",
-    "mc_jsonapi": "1.1.0"
+    "multimeter": "0.1.0"
   },
   "devDependencies": {},
   "optionalDependencies": {}
