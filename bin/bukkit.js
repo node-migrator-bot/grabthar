@@ -8,3 +8,7 @@ var bukkit = spawn('java', '-Xincgc -Xmx1024M -jar'.split(' ').concat(
 process.stdin.pipe(bukkit.stdin);
 bukkit.stdout.pipe(process.stdout);
 bukkit.stderr.pipe(process.stderr);
+
+process.stdin.resume();
+
+bukkit.on('exit', process.exit);
