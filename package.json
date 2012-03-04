@@ -15,9 +15,11 @@
   },
   "dependencies": {
     "colors": "*",
-    "request": "2.9.153",
+    "request": "git+ssh://git@github.com:jesusabdullah/request.git",
     "flatiron": "0.1.14",
-    "moment": "1.4.0"
+    "moment": "1.4.0",
+    "zip": "0.0.6",
+    "utile": "0.0.10"
   },
   "devDependencies": {},
   "optionalDependencies": {}
