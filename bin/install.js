@@ -20,23 +20,26 @@ function getCraftBukkit (next) {
 
   app.log.info('Downloading ' + 'craftbukkit'.cyan + '...');
 
-  request(craftbukkit.url)
-    .pipe(fs.createWriteStream(craftbukkit.path))
-    .on('close', function (err) {
-    if (err) {
-      throw err;
-    }
+  app.ticker(function (t) {
 
-    app.ticker.stop(function () {
+    request(craftbukkit.url)
+      .pipe(fs.createWriteStream(craftbukkit.path))
+      .on('close', function (err) {
+        if (err) {
+          throw err;
+        }
 
-      app.log.info('Downloading ' + 'craftbukkit'.cyan + ' complete.');
+        t.stop(function () {
 
-      next();
-    });
+          app.log.info('Downloading ' + 'craftbukkit'.cyan + ' complete.');
 
+          next();
+
+        })
+      });
+    ;
+    t.start();
   });
-
-  app.ticker.start();
 }
 
 function getJSONApi (next) {
@@ -47,63 +50,63 @@ function getJSONApi (next) {
 
   app.log.info('Downloading ' + 'JSONApi'.cyan + '...');
 
-  var url = 'https://cloud.github.com/downloads/alecgorge/jsonapi/JSONAPI%20v3.4.3.zip';
+  app.ticker(function (t) {
 
-  request({
-    url: api.url
-  })
-    .pipe(fs.createWriteStream(api.path))
-    .on('close', function (err) {
-    if (err) {
-      throw err;
-    }
-
-    app.ticker.stop(function () {
-
-      app.log.info('Downloading ' + 'JSONApi'.cyan + ' complete.');
-
-      app.log.info('Unpacking ' + api.path.cyan );
-
-      // This api is all sync but whatever.
-      var files = zip.Reader(fs.readFileSync(api.path)).toObject('utf8');
-
-      utile.async.forEachSeries(Object.keys(files), function (fname, cb) {
-        var p = path.resolve(path.dirname(api.path), fname);
-
-        app.log.info('Writing '.blue + p);
-        utile.mkdirp(path.dirname(p), 0775, function (err) {
-          if (err) {
-            throw err;
-          }
-
-          fs.writeFileSync(
-            p,
-            files[fname]
-          );
-
-          cb();
-        })
-      }, function (err) {
+    request(api.url)
+      .pipe(fs.createWriteStream(api.path))
+      .on('close', function (err) {
         if (err) {
           throw err;
         }
 
-        app.log.info('Unpacked.');
-        app.log.info('Removing zip archive...');
+        t.stop(function () {
 
-        utile.rimraf(api.path, function (err) {
-          if (err) {
-            throw err;
-          }
+          app.log.info('Downloading ' + 'JSONApi'.cyan + ' complete.');
 
-          next();
+          app.log.info('Unpacking ' + api.path.cyan );
+
+          // This api is all sync but whatever.
+          var files = zip.Reader(fs.readFileSync(api.path)).toObject('utf8');
+
+          utile.async.forEachSeries(Object.keys(files), function (fname, cb) {
+            var p = path.resolve(path.dirname(api.path), fname);
+
+            app.log.info('Writing '.blue + p);
+            utile.mkdirp(path.dirname(p), 0775, function (err) {
+              if (err) {
+                throw err;
+              }
+
+              fs.writeFileSync(
+                p,
+                files[fname]
+              );
+
+              cb();
+            })
+          }, function (err) {
+            if (err) {
+              throw err;
+            }
+
+            app.log.info('Unpacked.');
+            app.log.info('Removing zip archive...');
+
+            utile.rimraf(api.path, function (err) {
+              if (err) {
+                throw err;
+              }
+
+              next();
+            });
+
+          });
         });
-
       });
-    });
-  });
 
-  app.ticker.start();
+    t.start();
+
+  });
 }
 
 getCraftBukkit(function () {
